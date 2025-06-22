@@ -11,32 +11,37 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 public class Janela extends JFrame
 {
-	public int sizeX = 600, sizeY = 500;
-	private int cont;
-	
 	private Container contentPane = getContentPane();
+	public static JPanel panel;
 	private JScrollPane scrollPane;
-	private JButton botao = new JButton();
+	private JButton botao;
+	
+	private int cont;
 	
 	public Janela()
 	{	
 		contentPane.setBackground(Color.white);
-		
 		setLayout(null);
-		setSize(sizeX, sizeY);
+		setSize(600, 500);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		panel.setBackground(Color.white);
-		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));	
+		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
 		scrollPane = new JScrollPane(panel);
 		
-		botao.setText("+");
+		JScrollBar horizontalBar = scrollPane.getHorizontalScrollBar();
+		horizontalBar.setUnitIncrement(30);
+		horizontalBar.setBlockIncrement(175);
+		
+		botao = new JButton("+");
 		botao.setSize(60, 60);
 		botao.setFocusPainted(false);
 		
@@ -47,19 +52,52 @@ public class Janela extends JFrame
 			{
 				JLabel igual = new JLabel("=");
 				panel.add(igual);
-			}	
+			}
 			Grandeza grandeza = new Grandeza(cont);
 			panel.add(grandeza);
 			cont++;
 		}
 		
-		// Método chamado quando a janela é redimensionada manualmente
-		addComponentListener(new ComponentAdapter()
+		botao.addActionListener(new ActionListener()
 		{
 			@Override
+			public void actionPerformed(ActionEvent event)
+			{
+				Grandeza.janelaOpcoes.dispose();
+				
+				JLabel igual = new JLabel("=");
+				panel.add(igual);
+				
+				Grandeza grandeza = new Grandeza(cont);
+				panel.add(grandeza);
+				cont++;
+				scrollPane.revalidate();
+				
+				// Aguarda a atualização do layout antes de executar
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run() 
+					{
+						horizontalBar.setValue(horizontalBar.getMaximum() - horizontalBar.getVisibleAmount()); 
+					}
+				});
+			}
+		});
+		
+		// Método chamado quando a janela é alterada manualmente
+		addComponentListener(new ComponentAdapter()
+		{
+			@Override 
 			public void componentResized(ComponentEvent event)
 			{
-				reposicionarComponentes();
+				posicionarComponentes();
+				Grandeza.janelaOpcoes.dispose();
+			}
+				
+			@Override
+			public void componentMoved(ComponentEvent e)
+			{
+				Grandeza.janelaOpcoes.dispose();
 			}
 		});
 		
@@ -69,22 +107,8 @@ public class Janela extends JFrame
 			@Override
 			public void windowStateChanged(WindowEvent event)
 			{
-				reposicionarComponentes();
-			}
-		});
-		
-		botao.addActionListener(new ActionListener()
-		{
-			@Override
-			public void actionPerformed(ActionEvent event)
-			{
-				JLabel igual = new JLabel("=");
-				panel.add(igual);
-				Grandeza grandeza = new Grandeza(cont);
-				panel.add(grandeza);
-				cont++;
-				
-				scrollPane.revalidate();
+				posicionarComponentes();
+				Grandeza.janelaOpcoes.dispose();
 			}
 		});
 		
@@ -93,7 +117,7 @@ public class Janela extends JFrame
 		setVisible(true);
 	}
 	
-	public void reposicionarComponentes()
+	private void posicionarComponentes()
 	{
 		scrollPane.revalidate();
 		scrollPane.setSize(contentPane.getWidth(), 118);
