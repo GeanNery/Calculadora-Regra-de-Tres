@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -17,16 +18,18 @@ import javax.swing.SwingUtilities;
 
 public class Janela extends JFrame
 {
-	private Container contentPane = getContentPane();
 	public static JPanel panel;
-	private JScrollPane scrollPane;
-	private JButton botao;
 	
+	private Container contentPane = getContentPane();
+	private Grandeza grandeza;
+	private JScrollPane scrollPane;
+	private JButton botaoAdicionar, botaoReset;
 	private int cont;
 	
 	public Janela()
 	{	
 		contentPane.setBackground(Color.white);
+		
 		setLayout(null);
 		setSize(600, 500);
 		setLocationRelativeTo(null);
@@ -41,9 +44,13 @@ public class Janela extends JFrame
 		horizontalBar.setUnitIncrement(30);
 		horizontalBar.setBlockIncrement(175);
 		
-		botao = new JButton("+");
-		botao.setSize(60, 60);
-		botao.setFocusPainted(false);
+		botaoAdicionar = new JButton("+");
+		botaoAdicionar.setSize(60, 60);
+		botaoAdicionar.setFocusPainted(false);
+		
+		botaoReset = new JButton("C");
+		botaoReset.setSize(60, 60);
+		botaoReset.setFocusPainted(false);
 		
 		cont = 1;
 		for(int i = 0; i < 2; i++)
@@ -53,27 +60,29 @@ public class Janela extends JFrame
 				JLabel igual = new JLabel("=");
 				panel.add(igual);
 			}
-			Grandeza grandeza = new Grandeza(cont);
+			
+			grandeza = new Grandeza(cont);
 			panel.add(grandeza);
 			cont++;
 		}
 		
-		botao.addActionListener(new ActionListener()
+		botaoAdicionar.addActionListener(new ActionListener()
 		{
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
-				Grandeza.janelaOpcoes.dispose();
+				if(Grandeza.janelaOpcoes != null && Grandeza.janelaOpcoes.isDisplayable())
+					Grandeza.janelaOpcoes.dispose();
 				
 				JLabel igual = new JLabel("=");
 				panel.add(igual);
 				
-				Grandeza grandeza = new Grandeza(cont);
+				grandeza = new Grandeza(cont);
 				panel.add(grandeza);
 				cont++;
 				scrollPane.revalidate();
 				
-				// Aguarda a atualização do layout antes de executar
+				// Aguarda a atualização do layout; Posiciona a barra de rolagem no final
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run() 
@@ -84,20 +93,55 @@ public class Janela extends JFrame
 			}
 		});
 		
+		botaoReset.addActionListener(new ActionListener()
+		{		
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				if(Grandeza.janelaOpcoes != null && Grandeza.janelaOpcoes.isDisplayable())
+					Grandeza.janelaOpcoes.dispose();
+				
+				// Remove as grandezas do JPanel e reinicia os títulos
+				Component components[] = panel.getComponents();
+				for(int i = 0; i < components.length; i++)
+				{
+					if(i > 2)
+						panel.remove(components[i]);
+					
+					if(components[i] instanceof Grandeza && i % 2 == 0)
+					{
+						Grandeza g = (Grandeza)components[i];
+						
+						if(i < 1)
+							g.titulo.setText("GRANDEZA  " + (i + 1));
+						else
+							g.titulo.setText("GRANDEZA  " + (i));
+					}
+				}
+				
+				cont = panel.getComponentCount();
+				scrollPane.revalidate();
+				scrollPane.repaint();
+			}
+		});
+		
 		// Método chamado quando a janela é alterada manualmente
 		addComponentListener(new ComponentAdapter()
 		{
 			@Override 
 			public void componentResized(ComponentEvent event)
 			{
+				if(Grandeza.janelaOpcoes != null && Grandeza.janelaOpcoes.isDisplayable())
+					Grandeza.janelaOpcoes.dispose();
+				
 				posicionarComponentes();
-				Grandeza.janelaOpcoes.dispose();
 			}
 				
 			@Override
-			public void componentMoved(ComponentEvent e)
+			public void componentMoved(ComponentEvent event)
 			{
-				Grandeza.janelaOpcoes.dispose();
+				if(Grandeza.janelaOpcoes != null && Grandeza.janelaOpcoes.isDisplayable())
+					Grandeza.janelaOpcoes.dispose();
 			}
 		});
 		
@@ -107,13 +151,16 @@ public class Janela extends JFrame
 			@Override
 			public void windowStateChanged(WindowEvent event)
 			{
+				if(Grandeza.janelaOpcoes != null && Grandeza.janelaOpcoes.isDisplayable())
+					Grandeza.janelaOpcoes.dispose();
+				
 				posicionarComponentes();
-				Grandeza.janelaOpcoes.dispose();
 			}
 		});
 		
 		add(scrollPane);
-		add(botao);
+		add(botaoAdicionar);
+		add(botaoReset);
 		setVisible(true);
 	}
 	
@@ -123,7 +170,8 @@ public class Janela extends JFrame
 		scrollPane.setSize(contentPane.getWidth(), 118);
 		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + (scrollPane.getHeight()*18/100)));
 		
-		botao.setLocation(getWidth()/2 - (botao.getWidth()/2 + 9), scrollPane.getY() + scrollPane.getHeight() + 15);
+		botaoAdicionar.setLocation(getWidth()/2, scrollPane.getY() + scrollPane.getHeight() + 15);
+		botaoReset.setLocation(getWidth()/2 - (botaoAdicionar.getWidth() + 19), scrollPane.getY() + scrollPane.getHeight() + 15);
 	}
 	
 	public static void main(String[] args)
