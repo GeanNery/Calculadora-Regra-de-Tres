@@ -12,7 +12,7 @@ import javax.swing.JTextField;
 public class Grandeza extends JPanel
 {
 	public static JanelaOpcoes janelaOpcoes;
-	public JTextField titulo;
+	public JTextField titulo, A1, B1;
 	
 	private Dimension sizeGrandeza = new Dimension(100, 100);
 	private Dimension sizeTextField = new Dimension(0, 35);
@@ -48,17 +48,19 @@ public class Grandeza extends JPanel
 		    gbc.insets = new Insets(0, 0, 3, 0);
 		add(titulo, gbc);
 		    
-		JTextField A1 = new JTextField(8);
+		A1 = new JTextField(8);
 	    	A1.setPreferredSize(sizeTextField);
 	    	A1.setHorizontalAlignment(JTextField.CENTER);
+	    	A1.getDocument().addDocumentListener(Janela.documentListener);
 	    	A1.addMouseListener(mouseListener);
 	    	gbc.gridy = 1;
 	    	gbc.insets = new Insets(0, 0, 8, 0);
 	    add(A1, gbc);
 	    	
-		JTextField B1 = new JTextField(8);
+		B1 = new JTextField(8);
 	    	B1.setPreferredSize(sizeTextField);
 	    	B1.setHorizontalAlignment(JTextField.CENTER);
+	    	B1.getDocument().addDocumentListener(Janela.documentListener);
 	    	B1.addMouseListener(mouseListener);
 	    	gbc.gridy = 2;
 	    	gbc.insets = new Insets(0, 0, 0, 0);
