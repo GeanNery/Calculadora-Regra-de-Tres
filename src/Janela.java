@@ -48,7 +48,7 @@ public class Janela extends JFrame
 	private static ArrayList<JTextField> textFields = new ArrayList<JTextField>();
 	private static Component components[];
 	private static Grandeza grandeza;
-	private static int cont;
+	private static int cont, posIncognita, posAux;
 	
 	private Container contentPane = getContentPane();
 	private JScrollPane scrollPane;
@@ -141,15 +141,15 @@ public class Janela extends JFrame
 					// reinicia os títulos dos componentes do tipo Grandeza:
 					if(components[i] instanceof Grandeza && i % 2 == 0)
 					{
-						Grandeza g1 = (Grandeza) components[i];
+						grandeza = (Grandeza) components[i];
 						
 						if(i < 1)
-							g1.titulo.setText("GRANDEZA  " + (i + 1));
+							grandeza.titulo.setText("GRANDEZA  " + (i + 1));
 						else
-							g1.titulo.setText("GRANDEZA  " + (i));
+							grandeza.titulo.setText("GRANDEZA  " + (i));
 						
-						g1.A1.setText("");
-						g1.B1.setText("");
+						grandeza.A1.setText("");
+						grandeza.B1.setText("");
 					}
 				}
 				
@@ -208,7 +208,7 @@ public class Janela extends JFrame
 		botaoClear.setLocation(getWidth()/2 - (botaoAdicionar.getWidth() + 19), scrollPane.getY() + scrollPane.getHeight() + 15);
 	}
 	
-	private static void definirIncognita()
+	public static void definirIncognita()
 	{
 		SwingUtilities.invokeLater(new Runnable()
 		{
@@ -223,9 +223,9 @@ public class Janela extends JFrame
 				{
 					if(components[i] instanceof Grandeza)
 					{
-						Grandeza g2 = (Grandeza)components[i];
-						textFields.add(g2.A1);
-						textFields.add(g2.B1);			
+						grandeza = (Grandeza)components[i];
+						textFields.add(grandeza.A1);
+						textFields.add(grandeza.B1);			
 					}
 				}
 				
@@ -234,18 +234,27 @@ public class Janela extends JFrame
 				{	
 					// se o campo estiver em branco, camposPreenchidos aumenta +1
 					if(textFields.get(j).getText().isBlank() == false && textFields.get(j).getText().equals("X") == false)
+					{
 						camposPreenchidos++;
 						
-					// ao chegar no penúltimo campo, o último automaticamente se torna a incógnita
-					if(camposPreenchidos == (textFields.size()-1))
-					{
-						for(int l = 0; l < textFields.size(); l++)
+						// ao chegar no penúltimo campo, o último automaticamente se torna a incógnita
+						if(camposPreenchidos == (textFields.size()-1))
 						{
-							if(textFields.get(l).getText().isBlank() == true)
+							for(int l = 0; l < textFields.size(); l++)
 							{
-								textFields.get(l).setEditable(false);
-								textFields.get(l).setText("X");
-								return;
+								if(textFields.get(l).getText().isBlank() == true)
+								{
+									textFields.get(l).setEditable(false);
+									textFields.get(l).setText("X");
+									posIncognita = textFields.indexOf(textFields.get(l));
+									
+									if(textFields.get(l) == grandeza.A1)
+										posAux = 2;
+									else if(textFields.get(l) == grandeza.B1)
+										posAux = 1;
+	
+									return;
+								}
 							}
 						}
 					}
@@ -263,6 +272,14 @@ public class Janela extends JFrame
 							return;
 						}
 					}
+				}
+				else if(camposPreenchidos == textFields.size())
+				{
+					while(posIncognita >= textFields.size())
+						posIncognita -= posAux;
+					
+					textFields.get(posIncognita).setEditable(false);
+					textFields.get(posIncognita).setText("X");
 				}
 			}
 		});

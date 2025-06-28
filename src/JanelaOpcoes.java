@@ -46,6 +46,7 @@ public class JanelaOpcoes extends JFrame
 				dispose();
 				Janela.panel.revalidate();
 				Janela.panel.repaint();
+				Janela.definirIncognita();
 			}
 		});
     	
