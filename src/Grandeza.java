@@ -8,17 +8,49 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 public class Grandeza extends JPanel
 {
 	public static JanelaOpcoes janelaOpcoes;
 	public JTextField titulo, A1, B1;
 	
-	private Dimension sizeGrandeza = new Dimension(100, 100);
-	private Dimension sizeTextField = new Dimension(0, 35);
+	private String tituloReserva;
+	
+	private DocumentListener documentListener = new DocumentListener()
+	{
+		@Override
+		public void removeUpdate(DocumentEvent event)
+		{
+			Janela.definirIncognita();
+			
+			if(event.getDocument() != titulo.getDocument() && titulo.getText().isBlank())
+				reiniciarTitulo();
+		}
+		
+		@Override
+		public void insertUpdate(DocumentEvent event)
+		{
+			Janela.definirIncognita();
+			
+			if(event.getDocument() != titulo.getDocument() && titulo.getText().isBlank())
+				reiniciarTitulo();
+		}
+		
+		@Override
+		public void changedUpdate(DocumentEvent event)
+		{
+			
+		}
+	};
 	
 	public Grandeza(int cont)
 	{
+		tituloReserva = "GRANDEZA  " + cont;
+		Dimension sizeGrandeza = new Dimension(100, 100);
+		Dimension sizeTextField = new Dimension(0, 35);
+		
 		MouseListener mouseListener = new MouseAdapter()
 		{
 	    	public void mouseClicked(MouseEvent event)
@@ -39,7 +71,7 @@ public class Grandeza extends JPanel
 		setPreferredSize(sizeGrandeza);
 		addMouseListener(mouseListener);
 		
-		titulo = new JTextField("GRANDEZA  " + cont);
+		titulo = new JTextField(tituloReserva);
 		    titulo.setHorizontalAlignment(JTextField.CENTER);
 		    titulo.setBorder(null);
 		    titulo.setBackground(null);
@@ -51,7 +83,7 @@ public class Grandeza extends JPanel
 		A1 = new JTextField(8);
 	    	A1.setPreferredSize(sizeTextField);
 	    	A1.setHorizontalAlignment(JTextField.CENTER);
-	    	A1.getDocument().addDocumentListener(Janela.documentListener);
+	    	A1.getDocument().addDocumentListener(documentListener);
 	    	A1.addMouseListener(mouseListener);
 	    	gbc.gridy = 1;
 	    	gbc.insets = new Insets(0, 0, 8, 0);
@@ -60,10 +92,15 @@ public class Grandeza extends JPanel
 		B1 = new JTextField(8);
 	    	B1.setPreferredSize(sizeTextField);
 	    	B1.setHorizontalAlignment(JTextField.CENTER);
-	    	B1.getDocument().addDocumentListener(Janela.documentListener);
+	    	B1.getDocument().addDocumentListener(documentListener);
 	    	B1.addMouseListener(mouseListener);
 	    	gbc.gridy = 2;
 	    	gbc.insets = new Insets(0, 0, 0, 0);
 	    add(B1, gbc);
+	}
+	
+	public void reiniciarTitulo()
+	{
+		titulo.setText(tituloReserva);
 	}
 }

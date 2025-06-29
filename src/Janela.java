@@ -17,35 +17,11 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
 public class Janela extends JFrame
 {
-	public static DocumentListener documentListener = new DocumentListener()
-	{
-		@Override
-		public void removeUpdate(DocumentEvent event)
-		{
-			definirIncognita();
-		}
-		
-		@Override
-		public void insertUpdate(DocumentEvent event)
-		{
-			definirIncognita();
-		}
-		
-		@Override
-		public void changedUpdate(DocumentEvent event)
-		{
-			definirIncognita();
-		}
-	};
-	
 	public static JPanel panel;
 	
-	private static ArrayList<JTextField> textFields = new ArrayList<JTextField>();
 	private static Component components[];
 	private static Grandeza grandeza;
 	private static int cont, posIncognita, posAux;
@@ -58,6 +34,7 @@ public class Janela extends JFrame
 	{	
 		contentPane.setBackground(Color.white);
 		
+		setTitle("Regra de Três Simples e Composta");
 		setLayout(null);
 		setSize(600, 500);
 		setLocationRelativeTo(null);
@@ -67,10 +44,11 @@ public class Janela extends JFrame
 		panel.setBackground(Color.white);
 		panel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 0));
 		scrollPane = new JScrollPane(panel);
+		scrollPane.setOpaque(true);
 		
-		JScrollBar horizontalBar = scrollPane.getHorizontalScrollBar();
-		horizontalBar.setUnitIncrement(30);
-		horizontalBar.setBlockIncrement(175);
+		JScrollBar barraHorizontal = scrollPane.getHorizontalScrollBar();
+		barraHorizontal.setUnitIncrement(30);
+		barraHorizontal.setBlockIncrement(175);
 		
 		botaoAdicionar = new JButton("+");
 		botaoAdicionar.setSize(60, 60);
@@ -109,13 +87,14 @@ public class Janela extends JFrame
 				panel.add(grandeza);
 				cont++;
 				scrollPane.revalidate();
+				scrollPane.repaint();
 				
-				// Aguarda a atualização do layout; Posiciona a barra de rolagem no final
+				//	Aguarda a atualização do layout; Posiciona a barra de rolagem no final
 				SwingUtilities.invokeLater(new Runnable()
 				{
 					public void run() 
 					{
-						horizontalBar.setValue(horizontalBar.getMaximum() - horizontalBar.getVisibleAmount()); 
+						barraHorizontal.setValue(barraHorizontal.getMaximum() - barraHorizontal.getVisibleAmount()); 
 					}
 				});
 				
@@ -134,11 +113,11 @@ public class Janela extends JFrame
 				components = panel.getComponents();				
 				for(int i = 0; i < components.length; i++)
 				{
-					// remove todos os componentes depois do índice 2:
+					//	Remove todos os componentes depois do índice 2:
 					if(i > 2)
 						panel.remove(components[i]);
 					
-					// reinicia os títulos dos componentes do tipo Grandeza:
+					//	Reinicia os títulos dos componentes do tipo Grandeza:
 					if(components[i] instanceof Grandeza && i % 2 == 0)
 					{
 						grandeza = (Grandeza) components[i];
@@ -159,7 +138,7 @@ public class Janela extends JFrame
 			}
 		});
 		
-		// Método chamado quando a janela é alterada manualmente
+		//	Método chamado quando a janela é alterada manualmente
 		addComponentListener(new ComponentAdapter()
 		{
 			@Override 
@@ -176,10 +155,12 @@ public class Janela extends JFrame
 			{
 				if(Grandeza.janelaOpcoes != null && Grandeza.janelaOpcoes.isDisplayable())
 					Grandeza.janelaOpcoes.dispose();
+				
+				reiniciarTitulo();
 			}
 		});
 		
-		// Método chamado quando o estado da janela é alterado
+		//	Método chamado quando o estado da janela é alterado
 		addWindowStateListener(new WindowAdapter()
 		{
 			@Override
@@ -198,16 +179,6 @@ public class Janela extends JFrame
 		setVisible(true);
 	}
 	
-	private void posicionarComponentes()
-	{
-		scrollPane.revalidate();
-		scrollPane.setSize(contentPane.getWidth(), 118);
-		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + (scrollPane.getHeight()*18/100)));
-		
-		botaoAdicionar.setLocation(getWidth()/2, scrollPane.getY() + scrollPane.getHeight() + 15);
-		botaoClear.setLocation(getWidth()/2 - (botaoAdicionar.getWidth() + 19), scrollPane.getY() + scrollPane.getHeight() + 15);
-	}
-	
 	public static void definirIncognita()
 	{
 		SwingUtilities.invokeLater(new Runnable()
@@ -215,9 +186,9 @@ public class Janela extends JFrame
 			@Override
 			public void run()
 			{
-				textFields.clear();
+				ArrayList<JTextField> textFields = new ArrayList<JTextField>();
 				
-				// adiciona todos os componentes do tipo JTextField em uma lista
+				//	Adiciona todos os componentes do tipo JTextField em uma lista
 				components = panel.getComponents();
 				for(int i = 0; i < components.length; i++)
 				{
@@ -225,19 +196,19 @@ public class Janela extends JFrame
 					{
 						grandeza = (Grandeza)components[i];
 						textFields.add(grandeza.A1);
-						textFields.add(grandeza.B1);			
+						textFields.add(grandeza.B1);
 					}
 				}
 				
 				int camposPreenchidos = 0;
 				for(int j = 0; j < textFields.size(); j++)
 				{	
-					// se o campo estiver em branco, camposPreenchidos aumenta +1
+					//	Se o campo estiver em branco, camposPreenchidos aumenta +1
 					if(textFields.get(j).getText().isBlank() == false && textFields.get(j).getText().equals("X") == false)
 					{
 						camposPreenchidos++;
 						
-						// ao chegar no penúltimo campo, o último automaticamente se torna a incógnita
+						//	Ao chegar no penúltimo campo, o último automaticamente se torna a incógnita
 						if(camposPreenchidos == (textFields.size()-1))
 						{
 							for(int l = 0; l < textFields.size(); l++)
@@ -246,7 +217,7 @@ public class Janela extends JFrame
 								{
 									textFields.get(l).setEditable(false);
 									textFields.get(l).setText("X");
-									posIncognita = textFields.indexOf(textFields.get(l));
+									posIncognita = textFields.indexOf(textFields.get(l));  // Salva o valor do índice da incógnita.
 									
 									if(textFields.get(l) == grandeza.A1)
 										posAux = 2;
@@ -260,11 +231,12 @@ public class Janela extends JFrame
 					}
 				}
 				
+				/*	Se o usuário apagar um campo de texto, o programa vasculha a lista textFields em busca de um
+					campo definido com o valor "X". Se ele for encontrado, ele é reiniciado e se torna editável novamente.  */
 				if(camposPreenchidos <= (textFields.size()-2))
 				{
 					for(int m = 0; m < textFields.size(); m++)
 					{
-						// se o campo estiver definido como "X", ou não for editável:
 						if(textFields.get(m).getText().equals("X") || textFields.get(m).isEditable() == false)
 						{
 							textFields.get(m).setEditable(true);
@@ -275,6 +247,9 @@ public class Janela extends JFrame
 				}
 				else if(camposPreenchidos == textFields.size())
 				{
+					/*	Se o usuário deletar uma grandeza, e as restantes estiverem com todos os seus campos preenchidos,
+						a posição da incógnita é escolhida de acordo com o campo A ou B preenchido da última vez.  */
+					
 					while(posIncognita >= textFields.size())
 						posIncognita -= posAux;
 					
@@ -283,6 +258,35 @@ public class Janela extends JFrame
 				}
 			}
 		});
+	}
+	
+	private void reiniciarTitulo()
+	{
+		components = panel.getComponents();
+		
+		for(int i = 0; i < components.length; i++)
+		{
+			if(components[i] instanceof Grandeza)
+			{
+				grandeza = (Grandeza)components[i];
+				
+				if(grandeza.titulo.getText().isBlank())
+					grandeza.reiniciarTitulo();
+			}
+		}
+	}
+	
+	private void posicionarComponentes()
+	{	
+		scrollPane.setSize(contentPane.getWidth(), 118);
+		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + 21));
+		scrollPane.revalidate();
+		scrollPane.repaint();
+		
+		botaoAdicionar.setLocation(getWidth()/2, scrollPane.getY() + scrollPane.getHeight() + 15);
+		botaoClear.setLocation(getWidth()/2 - (botaoAdicionar.getWidth() + 19), scrollPane.getY() + scrollPane.getHeight() + 15);
+
+		reiniciarTitulo();
 	}
 	
 	public static void main(String[] args)
