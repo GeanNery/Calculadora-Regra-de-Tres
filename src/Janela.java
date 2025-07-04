@@ -1,7 +1,11 @@
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -20,15 +24,17 @@ import javax.swing.SwingUtilities;
 
 public class Janela extends JFrame
 {
-	public static JPanel panel;
+	public static JPanel panel, panel2;
 	
 	private static Component components[];
-	private static Grandeza grandeza;
+	private static Grandeza grandeza, grandInc;
 	private static int cont, posIncognita, posAux;
 	
 	private Container contentPane = getContentPane();
 	private JScrollPane scrollPane;
-	private JButton botaoAdicionar, botaoClear;
+	private JButton botaoAdicionar, botaoClear, botaoCalcular;
+	private static JTextField incognita, outro;
+	private static boolean inverterResultado;
 	
 	public Janela()
 	{	
@@ -46,17 +52,26 @@ public class Janela extends JFrame
 		scrollPane = new JScrollPane(panel);
 		scrollPane.setOpaque(true);
 		
+		panel2 = new JPanel();
+		panel2.setLayout(new GridBagLayout());
+		panel2.setSize(155, 135);
+		GridBagConstraints gbc = new GridBagConstraints();
+		
 		JScrollBar barraHorizontal = scrollPane.getHorizontalScrollBar();
 		barraHorizontal.setUnitIncrement(30);
 		barraHorizontal.setBlockIncrement(175);
 		
 		botaoAdicionar = new JButton("+");
-		botaoAdicionar.setSize(60, 60);
+		botaoAdicionar.setPreferredSize(new Dimension(60, 60));
 		botaoAdicionar.setFocusPainted(false);
 		
 		botaoClear = new JButton("C");
-		botaoClear.setSize(60, 60);
+		botaoClear.setPreferredSize(new Dimension(60, 60));
 		botaoClear.setFocusPainted(false);
+		
+		botaoCalcular = new JButton("Calcular");
+		botaoCalcular.setPreferredSize(new Dimension(120, 60));
+		botaoCalcular.setFocusPainted(false);
 		
 		cont = 1;
 		for(int i = 0; i < 2; i++)
@@ -86,8 +101,10 @@ public class Janela extends JFrame
 				grandeza = new Grandeza(cont);
 				panel.add(grandeza);
 				cont++;
+				
 				scrollPane.revalidate();
 				scrollPane.repaint();
+				definirIncognita();
 				
 				//	Aguarda a atualização do layout; Posiciona a barra de rolagem no final
 				SwingUtilities.invokeLater(new Runnable()
@@ -97,8 +114,6 @@ public class Janela extends JFrame
 						barraHorizontal.setValue(barraHorizontal.getMaximum() - barraHorizontal.getVisibleAmount()); 
 					}
 				});
-				
-				definirIncognita();
 			}
 		});
 		
@@ -138,6 +153,53 @@ public class Janela extends JFrame
 			}
 		});
 		
+		botaoCalcular.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{	
+				int a2 = 1;
+				int b2 = 1;
+				
+				components = panel.getComponents();
+				for(int i = 0; i < components.length; i++)
+				{
+					if(components[i] instanceof Grandeza)
+					{
+						grandeza = (Grandeza) components[i];
+						
+						if(grandeza.A1.getText().equals("X") || grandeza.B1.getText().equals("X"))
+						{
+							grandInc = grandeza;
+							
+							if(grandInc.A1.getText().equals("X"))
+							{
+								incognita = grandInc.A1;
+								outro = grandInc.B1;
+								inverterResultado = false;
+							}
+							else if(grandInc.B1.getText().equals("X"))
+							{
+								outro = grandInc.A1;
+								incognita = grandInc.B1;
+								inverterResultado = true;
+							}
+						}
+						else
+						{
+							a2 *= Integer.valueOf(grandeza.A1.getText());
+							b2 *= Integer.valueOf(grandeza.B1.getText());
+						}
+					}
+				}
+				
+				if(inverterResultado == true)
+					System.out.println(String.valueOf(b2 * Integer.valueOf(outro.getText()) / a2));
+				else
+					System.out.println(String.valueOf(a2 * Integer.valueOf(outro.getText()) / b2));
+			}
+		});
+		
 		//	Método chamado quando a janela é alterada manualmente
 		addComponentListener(new ComponentAdapter()
 		{
@@ -173,9 +235,26 @@ public class Janela extends JFrame
 			}
 		});
 		
+		gbc.insets = new Insets(3, 8, 3, 8);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		panel2.add(botaoClear, gbc);
+		
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		gbc.gridwidth = 1;
+		panel2.add(botaoAdicionar, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		gbc.gridwidth = 2;
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		panel2.add(botaoCalcular, gbc);
+		
 		add(scrollPane);
-		add(botaoAdicionar);
-		add(botaoClear);
+		add(panel2);
 		setVisible(true);
 	}
 	
@@ -217,7 +296,7 @@ public class Janela extends JFrame
 								{
 									textFields.get(l).setEditable(false);
 									textFields.get(l).setText("X");
-									posIncognita = textFields.indexOf(textFields.get(l));  // Salva o valor do índice da incógnita.
+									posIncognita = textFields.indexOf(textFields.get(l));  // Salva o valor do índice da incógnita
 									
 									if(textFields.get(l) == grandeza.A1)
 										posAux = 2;
@@ -247,8 +326,8 @@ public class Janela extends JFrame
 				}
 				else if(camposPreenchidos == textFields.size())
 				{
-					/*	Se o usuário deletar uma grandeza, e as restantes estiverem com todos os seus campos preenchidos,
-						a posição da incógnita é escolhida de acordo com o campo A ou B preenchido da última vez.  */
+					/*	Se o usuário deletar a grandeza com a incógnita, e as restantes estiverem com todos os seus campos
+						preenchidos, a posição da incógnita é escolhida de acordo com o campo A ou B preenchido da última vez.  */
 					
 					while(posIncognita >= textFields.size())
 						posIncognita -= posAux;
@@ -279,13 +358,11 @@ public class Janela extends JFrame
 	private void posicionarComponentes()
 	{	
 		scrollPane.setSize(contentPane.getWidth(), 118);
-		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + 21));
+		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + 40));
 		scrollPane.revalidate();
 		scrollPane.repaint();
 		
-		botaoAdicionar.setLocation(getWidth()/2, scrollPane.getY() + scrollPane.getHeight() + 15);
-		botaoClear.setLocation(getWidth()/2 - (botaoAdicionar.getWidth() + 19), scrollPane.getY() + scrollPane.getHeight() + 15);
-
+		panel2.setLocation(getWidth()/2 - (panel2.getWidth()/2 + 9), scrollPane.getY() + scrollPane.getHeight());
 		reiniciarTitulo();
 	}
 	

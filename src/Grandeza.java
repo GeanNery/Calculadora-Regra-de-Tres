@@ -48,7 +48,7 @@ public class Grandeza extends JPanel
 	public Grandeza(int cont)
 	{
 		tituloReserva = "GRANDEZA  " + cont;
-		Dimension sizeGrandeza = new Dimension(100, 100);
+		Dimension sizeGrandeza = new Dimension(104, 108);
 		Dimension sizeTextField = new Dimension(0, 35);
 		
 		MouseListener mouseListener = new MouseAdapter()
