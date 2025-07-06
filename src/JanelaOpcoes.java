@@ -11,11 +11,9 @@ public class JanelaOpcoes extends JFrame
 {
 	public JanelaOpcoes(Grandeza grandeza, Dimension sizeGrandeza)
 	{
-		Dimension sizeJanelaOpcoes = new Dimension(65, 34);
-		
+		setSize(65, 34);
 		setLayout(new FlowLayout(FlowLayout.CENTER));
-		setSize(sizeJanelaOpcoes);
-		setLocation(grandeza.getLocationOnScreen().x + (sizeGrandeza.width - sizeJanelaOpcoes.width), grandeza.getLocationOnScreen().y - sizeJanelaOpcoes.height);
+		setLocation(grandeza.getLocationOnScreen().x + (sizeGrandeza.width - getWidth()), grandeza.getLocationOnScreen().y - getHeight());
 		
 		setAlwaysOnTop(true);
 		setUndecorated(true);
@@ -29,26 +27,29 @@ public class JanelaOpcoes extends JFrame
 				inverter.setPreferredSize(new Dimension(25, 23));
 				inverter.setFocusPainted(false);
 		
-		remover.addActionListener(new ActionListener()
+		if(Janela.painelGrandezas.getComponentCount() > 3)
 		{
-			@Override
-			public void actionPerformed(ActionEvent e)
+			remover.addActionListener(new ActionListener()
 			{
-				int indice = Janela.panel.getComponentZOrder(grandeza);
-				
-				// Remove a grandeza e o sinal de igualdade adjacente
-				Janela.panel.remove(grandeza);
-				if(indice > 1)
-					Janela.panel.remove(indice - 1);
-				else
-					Janela.panel.remove(indice);
-				
-				dispose();
-				Janela.panel.revalidate();
-				Janela.panel.repaint();
-				Janela.definirIncognita();
-			}
-		});
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					// Remove a grandeza e o sinal de igualdade ao lado
+					int indice = Janela.painelGrandezas.getComponentZOrder(grandeza);
+					
+					Janela.painelGrandezas.remove(grandeza);
+					if(indice > 0)
+						Janela.painelGrandezas.remove(indice - 1);
+					else
+						Janela.painelGrandezas.remove(indice);
+					
+					Janela.painelGrandezas.revalidate();
+					Janela.painelGrandezas.repaint();
+					Janela.definirIncognita();
+					dispose();
+				}
+			});
+		}
     	
 		add(inverter);
 		add(remover);
