@@ -22,6 +22,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -158,57 +159,68 @@ public class Janela extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{	
-				JTextField incognita = null, 
-						   outro = null;
-				BigDecimal valorA = new BigDecimal("1"), 
-						   valorB = new BigDecimal("1"), 
-						   resultado;
-				boolean inverterCalculo = false;
-				
-				estaCalculando = true;	
-				for(Component component : painelGrandezas.getComponents())
+				try
 				{
-					if(component instanceof Grandeza)
+					JTextField incognita = null, 
+							   outro = null;
+					BigDecimal valorA = new BigDecimal("1"), 
+							   valorB = new BigDecimal("1"), 
+							   resultado;
+					boolean inverterCalculo = false;
+					
+					estaCalculando = true;	
+					for(Component component : painelGrandezas.getComponents())
 					{
-						Grandeza g = (Grandeza)component;
-						
-						if(g.A1.getText().equals(caractere) || g.A1.isEditable() == false)
+						if(component instanceof Grandeza)
 						{
-							incognita = g.A1;
-							outro = g.B1;
-							inverterCalculo = false;
-						}
-						else if(g.B1.getText().equals(caractere) || g.B1.isEditable() == false)
-						{
-							incognita = g.B1;
-							outro = g.A1;
-							inverterCalculo = true;
-						}
-						else
-						{
-							//	Multiplica os numeradores e denominadores entre si
-							if(g.inverso == false)
+							Grandeza g = (Grandeza)component;
+							
+							if(g.A1.getText().equals(caractere) || g.A1.isEditable() == false)
 							{
-								valorA = valorA.multiply(new BigDecimal(g.A1.getText()));
-								valorB = valorB.multiply(new BigDecimal(g.B1.getText()));
+								incognita = g.A1;
+								outro = g.B1;
+								inverterCalculo = false;
+							}
+							else if(g.B1.getText().equals(caractere) || g.B1.isEditable() == false)
+							{
+								incognita = g.B1;
+								outro = g.A1;
+								inverterCalculo = true;
 							}
 							else
 							{
-								valorA = valorA.multiply(new BigDecimal(g.B1.getText()));
-								valorB = valorB.multiply(new BigDecimal(g.A1.getText()));
+								//	Multiplica os numeradores e denominadores entre si
+								if(g.inverso == false)
+								{
+									valorA = valorA.multiply(new BigDecimal(g.A1.getText()));
+									valorB = valorB.multiply(new BigDecimal(g.B1.getText()));
+								}
+								else
+								{
+									valorA = valorA.multiply(new BigDecimal(g.B1.getText()));
+									valorB = valorB.multiply(new BigDecimal(g.A1.getText()));
+								}
 							}
 						}
 					}
+					
+					//	Garante que o cálculo será cruzado
+					if(inverterCalculo == true)
+						resultado = valorB.multiply(new BigDecimal(outro.getText())).divide(valorA, 8, RoundingMode.HALF_UP);  // Valor B multiplicado por Outro, dividido por valor A.
+					else
+						resultado = valorA.multiply(new BigDecimal(outro.getText())).divide(valorB, 8, RoundingMode.HALF_UP);  // Valor A multiplicado por Outro, dividido por valor B.
+					
+					Grandeza.fecharJanela();
+					alterarTexto(incognita, false, String.valueOf(resultado.stripTrailingZeros().toPlainString()));
+				}
+				catch(NumberFormatException exception)
+				{
+					if(exception.getCause() == null)
+						JOptionPane.showMessageDialog(null, "Valores inválidos! Tente novamente.", "ERRO!", JOptionPane.ERROR_MESSAGE);
+					else
+						JOptionPane.showMessageDialog(null, "Preencha todos os campos necessários.", null, JOptionPane.WARNING_MESSAGE);
 				}
 				
-				//	Garante que o cálculo será cruzado
-				if(inverterCalculo == true)
-					resultado = valorB.multiply(new BigDecimal(outro.getText())).divide(valorA, 8, RoundingMode.HALF_UP);  // Valor B multiplicado por Outro, dividido por valor A.
-				else
-					resultado = valorA.multiply(new BigDecimal(outro.getText())).divide(valorB, 8, RoundingMode.HALF_UP);  // Valor A multiplicado por Outro, dividido por valor B.
-				
-				Grandeza.fecharJanela();
-				alterarTexto(incognita, false, String.valueOf(resultado.stripTrailingZeros().toPlainString()));
 				estaCalculando = false;
 			}
 		});
