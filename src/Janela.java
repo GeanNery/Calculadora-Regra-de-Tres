@@ -35,9 +35,9 @@ import javax.swing.border.MatteBorder;
 public class Janela extends JFrame
 {
 	public static JPanel painelGrandezas, painelBotoes;
+	public static String caractere = "x";
 	
-	private static String caractere = "x";
-	private static int posicao, posicaoAux;
+	private static int posicao = 3, posicaoAux;
 	private static boolean estaCalculando;
 	
 	private Container contentPane = getContentPane();
@@ -47,13 +47,15 @@ public class Janela extends JFrame
 	
 	public Janela()
 	{	
-		EmptyBorder bordaVazia = new EmptyBorder(8, 0, 0, 0);
-		MatteBorder bordaPreta = new MatteBorder(1, 1, 3, 1, Color.BLACK);
-		MatteBorder bordaBranca = new MatteBorder(2, 0, 0, 0, Color.WHITE);
-		CompoundBorder compoundBorder = new CompoundBorder(bordaPreta, bordaBranca);
+		// Bordas:
+			EmptyBorder bordaVazia = new EmptyBorder(8, 0, 0, 0);
+			MatteBorder bordaPreta = new MatteBorder(1, 1, 3, 1, Color.BLACK);
+			MatteBorder bordaBranca = new MatteBorder(2, 0, 0, 0, Color.WHITE);
+			CompoundBorder compoundBorder = new CompoundBorder(bordaPreta, bordaBranca);
 		
-		Color corBackground = new Color(250, 250, 250);
-		Color corBotao = new Color(147, 219, 195);
+		// Cores:
+			Color corBackground = new Color(250, 250, 250);
+			Color corBotao = new Color(147, 219, 195);
 			
 		// JFrame:
 			contentPane.setBackground(corBackground);	
@@ -87,15 +89,6 @@ public class Janela extends JFrame
 			barraHorizontal.setBlockIncrement(175);
 		
 		// Botões:
-			botaoAdicionar = new JButton("+");
-			botaoAdicionar.setBackground(corBotao);
-			botaoAdicionar.setBorder(BorderFactory.createCompoundBorder(compoundBorder, bordaVazia));
-			botaoAdicionar.setFocusPainted(false);
-			botaoAdicionar.setFont(new Font("Calibri", Font.BOLD, 24));
-			botaoAdicionar.setForeground(Color.white);
-			botaoAdicionar.setMargin(new Insets(8, 0, 0, 0));
-			botaoAdicionar.setPreferredSize(new Dimension(60, 60));
-			
 			botaoClear = new JButton("C");
 			botaoClear.setBackground(corBotao);
 			botaoClear.setBorder(BorderFactory.createCompoundBorder(compoundBorder, bordaVazia));
@@ -104,6 +97,15 @@ public class Janela extends JFrame
 			botaoClear.setForeground(Color.white);
 			botaoClear.setMargin(new Insets(8, 0, 0, 0));
 			botaoClear.setPreferredSize(new Dimension(60, 60));
+			
+			botaoAdicionar = new JButton("+");
+			botaoAdicionar.setBackground(corBotao);
+			botaoAdicionar.setBorder(BorderFactory.createCompoundBorder(compoundBorder, bordaVazia));
+			botaoAdicionar.setFocusPainted(false);
+			botaoAdicionar.setFont(new Font("Calibri", Font.BOLD, 24));
+			botaoAdicionar.setForeground(Color.white);
+			botaoAdicionar.setMargin(new Insets(8, 0, 0, 0));
+			botaoAdicionar.setPreferredSize(new Dimension(60, 60));
 			
 			botaoCalcular = new JButton("=");
 			botaoCalcular.setBackground(corBotao);
@@ -118,7 +120,7 @@ public class Janela extends JFrame
 		barraHorizontal.addAdjustmentListener(new AdjustmentListener()
 		{
 			@Override
-			public void adjustmentValueChanged(AdjustmentEvent e)
+			public void adjustmentValueChanged(AdjustmentEvent event)
 			{
 				Grandeza.fecharJanela();
 			}
@@ -146,7 +148,7 @@ public class Janela extends JFrame
 		botaoClear.addActionListener(new ActionListener()
 		{		
 			@Override
-			public void actionPerformed(ActionEvent e)
+			public void actionPerformed(ActionEvent event)
 			{
 				Grandeza.fecharJanela();	
 				painelGrandezas.removeAll();
@@ -159,69 +161,8 @@ public class Janela extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent e)
 			{	
-				try
-				{
-					JTextField incognita = null, 
-							   outro = null;
-					BigDecimal valorA = new BigDecimal("1"), 
-							   valorB = new BigDecimal("1"), 
-							   resultado;
-					boolean inverterCalculo = false;
-					
-					estaCalculando = true;	
-					for(Component component : painelGrandezas.getComponents())
-					{
-						if(component instanceof Grandeza)
-						{
-							Grandeza g = (Grandeza)component;
-							
-							if(g.A1.getText().equals(caractere) || g.A1.isEditable() == false)
-							{
-								incognita = g.A1;
-								outro = g.B1;
-								inverterCalculo = false;
-							}
-							else if(g.B1.getText().equals(caractere) || g.B1.isEditable() == false)
-							{
-								incognita = g.B1;
-								outro = g.A1;
-								inverterCalculo = true;
-							}
-							else
-							{
-								//	Multiplica os numeradores e denominadores entre si
-								if(g.inverso == false)
-								{
-									valorA = valorA.multiply(new BigDecimal(g.A1.getText()));
-									valorB = valorB.multiply(new BigDecimal(g.B1.getText()));
-								}
-								else
-								{
-									valorA = valorA.multiply(new BigDecimal(g.B1.getText()));
-									valorB = valorB.multiply(new BigDecimal(g.A1.getText()));
-								}
-							}
-						}
-					}
-					
-					//	Garante que o cálculo será cruzado
-					if(inverterCalculo == true)
-						resultado = valorB.multiply(new BigDecimal(outro.getText())).divide(valorA, 8, RoundingMode.HALF_UP);  // Valor B multiplicado por Outro, dividido por valor A.
-					else
-						resultado = valorA.multiply(new BigDecimal(outro.getText())).divide(valorB, 8, RoundingMode.HALF_UP);  // Valor A multiplicado por Outro, dividido por valor B.
-					
-					Grandeza.fecharJanela();
-					alterarTexto(incognita, false, String.valueOf(resultado.stripTrailingZeros().toPlainString()));
-				}
-				catch(NumberFormatException exception)
-				{
-					if(exception.getCause() == null)
-						JOptionPane.showMessageDialog(null, "Valores inválidos! Tente novamente.", "ERRO!", JOptionPane.ERROR_MESSAGE);
-					else
-						JOptionPane.showMessageDialog(null, "Preencha todos os campos necessários.", null, JOptionPane.WARNING_MESSAGE);
-				}
-				
-				estaCalculando = false;
+				Grandeza.fecharJanela();
+				calcular();
 			}
 		});
 		
@@ -281,13 +222,171 @@ public class Janela extends JFrame
 		selecionarTexto();
 	}
 	
-	private void posicionarComponentes()
-	{	
-		scrollPane.setSize(contentPane.getWidth(), 150);
-		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + 50));
-		scrollPane.revalidate();
-		scrollPane.repaint();
-		painelBotoes.setLocation(getWidth()/2 - (painelBotoes.getWidth()/2 + 9), scrollPane.getY() + (scrollPane.getHeight() + 6));
+	public static void definirIncognita()
+	{
+		if(estaCalculando == true)
+			return;
+		
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				ArrayList<JTextField> textFields = new ArrayList<JTextField>();
+				Grandeza g = null;
+				int camposPreenchidos = 0;
+				
+				//	Adiciona todos os JTextFields em uma lista:
+				for(Component component : painelGrandezas.getComponents())
+				{	
+					if(component instanceof Grandeza)
+					{	
+						g = (Grandeza)component;
+						g.verificar();
+						
+						textFields.add(g.A1);
+						textFields.add(g.B1);
+					}
+				}
+				
+				// Verifica a quantidade de campos preenchidos:
+				for(JTextField textfield : textFields)
+				{	
+					if(textfield.getText().isBlank() == false && textfield.getText().equals(caractere) == false && textfield.isEditable() == true)
+						camposPreenchidos++;
+				}
+				
+				//	Preenchimento automático:
+				if(camposPreenchidos == textFields.size()-1)  // Se o penúltimo campo for preenchido, o último se torna a incógnita.
+				{
+					for(JTextField textfield : textFields)
+					{
+						if(textfield.getText().isBlank() == true || (textfield.isEditable() == false && textfield.getText().equals(caractere) == false))
+						{
+							((LimitarCaracteres) textfield.getDocument()).ativarDoc(false);
+							alterarTexto(textfield, caractere, true);
+							textfield.setEditable(false);
+							posicao = textFields.indexOf(textfield);
+							
+							if(textfield == g.A1)
+								posicaoAux = 2;
+							else if(textfield == g.B1)
+								posicaoAux = 1;
+							
+							return;
+						}
+					}
+				}
+				else if(camposPreenchidos <= textFields.size()-2)  // Se o usuário apagar o penúltimo campo, a incógnita é apagada.
+				{
+					for(JTextField textfield : textFields)
+					{
+						if(textfield.getText().equals(caractere) || textfield.isEditable() == false)
+						{
+							((LimitarCaracteres) textfield.getDocument()).ativarDoc(true);
+							alterarTexto(textfield, "", false);
+							textfield.setEditable(true);
+							return;
+						}
+					}
+				}
+				else if(camposPreenchidos == textFields.size())  // Se a grandeza contendo a incógnita for deletada, o "X" vai para a próxima disponível.
+				{
+					while(posicao >= textFields.size())
+						posicao -= posicaoAux;
+					
+					((LimitarCaracteres) textFields.get(posicao).getDocument()).ativarDoc(false);
+					alterarTexto(textFields.get(posicao), caractere, true);
+					textFields.get(posicao).setEditable(false);
+				}
+			}
+		});
+	}
+	
+	private static void alterarTexto(JTextField textField, String texto, Boolean mudarFonte)
+	{
+		if(mudarFonte == true)
+		{
+			textField.setFont(new Font("High Tower Text", Font.PLAIN + Font.ITALIC, 32));
+			textField.setMargin(new Insets(4, 0, 0, 0));
+			textField.setText(texto);
+		}
+		else
+		{
+			textField.setFont(new Font("Calibri", Font.PLAIN, 18));
+			textField.setMargin(new Insets(6, 0, 0, 0));
+			textField.setText(texto);
+		}
+	}
+	
+	private void calcular()
+	{
+		try
+		{
+			JTextField incognita = null, 
+					   outro = null;
+			BigDecimal valorA = new BigDecimal("1"), 
+					   valorB = new BigDecimal("1"), 
+					   resultado;
+			boolean inverterCalculo = false;
+			
+			estaCalculando = true;	
+			for(Component component : painelGrandezas.getComponents())
+			{
+				if(component instanceof Grandeza)
+				{
+					Grandeza g = (Grandeza)component;
+					
+					if(g.A1.getText().equals(caractere) || g.A1.isEditable() == false)
+					{
+						incognita = g.A1;
+						outro = g.B1;
+						inverterCalculo = false;
+					}
+					else if(g.B1.getText().equals(caractere) || g.B1.isEditable() == false)
+					{
+						incognita = g.B1;
+						outro = g.A1;
+						inverterCalculo = true;
+					}
+					else
+					{
+						//	Multiplica os numeradores e denominadores entre si
+						if(g.inverso == false)
+						{
+							valorA = valorA.multiply(new BigDecimal(g.A1.getText()));
+							valorB = valorB.multiply(new BigDecimal(g.B1.getText()));
+						}
+						else
+						{
+							valorA = valorA.multiply(new BigDecimal(g.B1.getText()));
+							valorB = valorB.multiply(new BigDecimal(g.A1.getText()));
+						}
+					}
+				}
+			}
+			
+			//	Garante que o cálculo será cruzado
+			if(inverterCalculo == true)
+				resultado = valorB.multiply(new BigDecimal(outro.getText())).divide(valorA, 8, RoundingMode.HALF_UP);  // Valor B multiplicado por C, dividido por valor A.
+			else
+				resultado = valorA.multiply(new BigDecimal(outro.getText())).divide(valorB, 8, RoundingMode.HALF_UP);  // Valor A multiplicado por C, dividido por valor B.
+			
+			alterarTexto(incognita, String.valueOf(resultado.stripTrailingZeros().toPlainString()), false);
+		}
+		catch(NumberFormatException exception)
+		{
+			if(exception.getCause() == null)
+				JOptionPane.showMessageDialog(null, "Valores inválidos!  Tente novamente.", "ERRO", JOptionPane.ERROR_MESSAGE);
+			else
+				JOptionPane.showMessageDialog(null, "Preencha todos os campos necessários!", "ATENÇÃO", JOptionPane.WARNING_MESSAGE);
+		}
+		catch (ArithmeticException exception) 
+		{
+			JOptionPane.showMessageDialog(null, "Não é possível realizar divisão por zero.  Insira outro valor.", "ERRO", JOptionPane.ERROR_MESSAGE);
+		}
+		
+		estaCalculando = false;
 	}
 	
 	private void criarGrandeza(int quant)
@@ -313,17 +412,13 @@ public class Janela extends JFrame
 		definirIncognita();
 	}
 	
-	private void selecionarTexto()
-	{
-		//  Seleciona o primeiro JTextField ao iniciar o programa
-		for(Component component : painelGrandezas.getComponents())
-		{
-			if(component instanceof Grandeza)
-			{
-				((Grandeza)component).A1.requestFocusInWindow();
-				break;
-			}
-		}
+	private void posicionarComponentes()
+	{	
+		scrollPane.setSize(contentPane.getWidth(), 150);
+		scrollPane.setLocation(contentPane.getWidth()/2 - scrollPane.getWidth()/2, contentPane.getHeight()/2 - (scrollPane.getHeight()/2 + 50));
+		scrollPane.revalidate();
+		scrollPane.repaint();
+		painelBotoes.setLocation(getWidth()/2 - (painelBotoes.getWidth()/2 + 9), scrollPane.getY() + (scrollPane.getHeight() + 6));
 	}
 	
 	private void reiniciarTitulos()
@@ -340,96 +435,17 @@ public class Janela extends JFrame
 		}
 	}
 	
-	private static void alterarTexto(JTextField textField, Boolean bool, String texto)
+	private void selecionarTexto()
 	{
-		if(bool == true)
+		//  Seleciona o primeiro JTextField ao iniciar o programa
+		for(Component component : painelGrandezas.getComponents())
 		{
-			textField.setFont(new Font("High Tower Text", Font.PLAIN + Font.ITALIC, 32));
-			textField.setMargin(new Insets(4, 0, 0, 0));
-			textField.setText(texto);
-		}
-		else
-		{
-			textField.setFont(new Font("Calibri", Font.PLAIN, 18));
-			textField.setMargin(new Insets(6, 0, 0, 0));
-			textField.setText(texto);
-		}
-	}
-	
-	public static void definirIncognita()
-	{
-		if(estaCalculando == true)
-			return;
-		
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			@Override
-			public void run()
+			if(component instanceof Grandeza)
 			{
-				ArrayList<JTextField> textFields = new ArrayList<JTextField>();
-				Grandeza g = null;
-				int camposPreenchidos = 0;
-				
-				//	Adiciona todos os JTextFields em uma lista:
-				for(Component component : painelGrandezas.getComponents())
-				{	
-					if(component instanceof Grandeza)
-					{	
-						g = (Grandeza)component;
-						textFields.add(g.A1);
-						textFields.add(g.B1);
-					}
-				}
-				
-				// Verifica a quantidade de campos preenchidos:
-				for(JTextField textfield : textFields)
-				{	
-					if(textfield.getText().isBlank() == false && textfield.getText().equals(caractere) == false && textfield.isEditable() == true)
-						camposPreenchidos++;
-				}
-				
-				//	Preenchimento automático:
-				if(camposPreenchidos == textFields.size()-1)  // Se o penúltimo campo for preenchido, o último se torna a incógnita.
-				{
-					for(JTextField textfield : textFields)
-					{
-						if(textfield.getText().isBlank() == true || (textfield.isEditable() == false && textfield.getText().equals(caractere) == false))
-						{
-							alterarTexto(textfield, true, caractere);
-							textfield.setEditable(false);
-							posicao = textFields.indexOf(textfield);
-							
-							if(textfield == g.A1)
-								posicaoAux = 2;
-							else if(textfield == g.B1)
-								posicaoAux = 1;
-							
-							return;
-						}
-					}
-				}
-				else if(camposPreenchidos <= textFields.size()-2)  // Se o usuário apagar o penúltimo campo, a incógnita é apagada.
-				{
-					for(JTextField textfield : textFields)
-					{
-						if(textfield.getText().equals(caractere) || textfield.isEditable() == false)
-						{
-							alterarTexto(textfield, false, "");
-							textfield.setEditable(true);
-							return;
-						}
-					}
-				}
-				else if(camposPreenchidos == textFields.size())  // Se a grandeza contendo a incógnita for deletada, o "X" vai para a próxima disponível.
-				{
-					while(posicao >= textFields.size())
-						posicao -= posicaoAux;
-					
-					alterarTexto(textFields.get(posicao), true, caractere);
-					textFields.get(posicao).setEditable(false);
-				}
+				((Grandeza)component).A1.requestFocusInWindow();
+				break;
 			}
-		});
+		}
 	}
 	
 	public static void main(String[] args)

@@ -19,50 +19,68 @@ public class JanelaOpcoes extends JFrame
 		getRootPane().setBorder(BorderFactory.createLineBorder(Color.BLACK, 1, false));
 		setUndecorated(true);
 		
-		JButton remover = new JButton();
-				remover.setPreferredSize(new Dimension(25, 23));
-				remover.setFocusPainted(false);
-				remover.setIcon(new ImageIcon(getClass().getResource("/icones/apagar.png")));
-				remover.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-				remover.setToolTipText("Remover grandeza");
+		// Botões:
+			JButton remover = new JButton();
+			remover.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
+			remover.setPreferredSize(new Dimension(25, 23));
+			remover.setFocusPainted(false);
+			remover.setIcon(new ImageIcon(getClass().getResource("/icones/apagar.png")));
+			remover.setPressedIcon(new ImageIcon(getClass().getResource("/icones/apagarSelected.png")));
+			remover.setToolTipText("Remover grandeza");
+			
+			JButton inverter = new JButton();
+			inverter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));		
+			inverter.setPreferredSize(new Dimension(25, 23));
+			inverter.setFocusPainted(false);
+			inverter.setIcon(new ImageIcon(getClass().getResource("/icones/inverter.png")));
+			inverter.setPressedIcon(new ImageIcon(getClass().getResource("/icones/inverterSelected.png")));
+			inverter.setToolTipText("Inverter cálculo");
 		
-		JButton inverter = new JButton();
-				inverter.setPreferredSize(new Dimension(25, 23));
-				inverter.setFocusPainted(false);
-				inverter.setIcon(new ImageIcon(getClass().getResource("/icones/inverter.png")));
-				inverter.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-				inverter.setToolTipText("Inverter cálculo");
-		
-		remover.addActionListener(new ActionListener()
+		if(Janela.painelGrandezas.getComponentCount() > 3)
 		{
-			@Override
-			public void actionPerformed(ActionEvent e)
+			remover.setEnabled(true);
+			remover.addActionListener(new ActionListener()
 			{
-				// Remove a grandeza e o sinal de igualdade ao lado
-				int indice = Janela.painelGrandezas.getComponentZOrder(grandeza);
-				Janela.painelGrandezas.remove(grandeza);
-				
-				if(indice > 0)
-					Janela.painelGrandezas.remove(indice - 1);
-				else
-					Janela.painelGrandezas.remove(indice);
-				
-				Janela.painelGrandezas.revalidate();
-				Janela.painelGrandezas.repaint();
-				Janela.definirIncognita();
-				dispose();
-			}
-		});
-		
-		inverter.addActionListener(new ActionListener()
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					// Remove a grandeza e o sinal de igualdade ao lado
+					int indice = Janela.painelGrandezas.getComponentZOrder(grandeza);
+					Janela.painelGrandezas.remove(grandeza);
+					
+					if(indice > 0)
+						Janela.painelGrandezas.remove(indice - 1);
+					else
+						Janela.painelGrandezas.remove(indice);
+					
+					Janela.painelGrandezas.revalidate();
+					Janela.painelGrandezas.repaint();
+					Janela.definirIncognita();
+					dispose();
+				}
+			});
+		}
+		else
 		{
-			@Override
-			public void actionPerformed(ActionEvent e)
+			remover.setEnabled(false);
+		}
+		
+		if(grandeza.A1.getText().isBlank() == false && grandeza.B1.getText().isBlank() == false && grandeza.temIncognita == false)
+		{
+			inverter.setEnabled(true);
+			inverter.addActionListener(new ActionListener()
 			{
-				grandeza.inverterGrandeza();
-				dispose();
-			}
-		});
+				@Override
+				public void actionPerformed(ActionEvent e)
+				{
+					grandeza.inverterGrandeza();
+				}
+			});
+		}
+		else 
+		{	
+			inverter.setEnabled(false);
+		}
     	
 		add(inverter);
 		add(remover);

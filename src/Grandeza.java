@@ -13,14 +13,15 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 public class Grandeza extends JPanel
-{
+{	
 	public JTextField titulo, A1, B1;
-	public boolean inverso = false;
+	public boolean inverso = false, temIncognita = false;
 	
 	private static JanelaOpcoes janelaOpcoes;
 	
@@ -33,6 +34,7 @@ public class Grandeza extends JPanel
 		@Override
 		public void removeUpdate(DocumentEvent event)
 		{
+			fecharJanela();
 			Janela.definirIncognita();
 			
 			if(event.getDocument() != titulo.getDocument() && titulo.getText().isBlank())
@@ -42,6 +44,7 @@ public class Grandeza extends JPanel
 		@Override
 		public void insertUpdate(DocumentEvent event)
 		{
+			fecharJanela();
 			Janela.definirIncognita();
 			
 			if(event.getDocument() != titulo.getDocument() && titulo.getText().isBlank())
@@ -61,7 +64,7 @@ public class Grandeza extends JPanel
 		{
 	    	public void mouseClicked(MouseEvent event)
 	    	{
-	    		if(event.getButton() == MouseEvent.BUTTON3 && Janela.painelGrandezas.getComponentCount() > 3)
+	    		if(event.getButton() == MouseEvent.BUTTON3)
 	    		{
 	    			abrirJanela = !abrirJanela;
 	    			fecharJanela();
@@ -73,63 +76,72 @@ public class Grandeza extends JPanel
 		};
 		
 		tituloReserva = "GRANDEZA  " + cont;
+		setPreferredSize(new Dimension(135, 133));
 		setBackground(new Color(140, 204, 183));
 		setLayout(new GridBagLayout());
-		setPreferredSize(new Dimension(130, 133));
 		
-		JPanel painel = new JPanel();
-		painel.setLayout(new BorderLayout());
-		painel.setOpaque(false);
-		painel.setPreferredSize(new Dimension(123, 13));
+		// Borda:
+			MatteBorder contorno = new MatteBorder(1, 1, 3, 1, Color.BLACK);
+			MatteBorder brilho = new MatteBorder(2, 0, 0, 0, Color.WHITE);
+			setBorder(BorderFactory.createCompoundBorder(contorno, brilho));
+			Insets textFieldInsets = new Insets(6, 0, 0, 0);
 		
-		ImageIcon iconeInvertido = new ImageIcon(getClass().getResource("/icones/invertido.png"));
-		labelIcone = new JLabel(iconeInvertido);
-		labelIcone.setToolTipText("Grandeza inversamente proporcional");
-		labelIcone.setVisible(false);
-		painel.add(labelIcone, BorderLayout.WEST);
+		// Painel do ícone:
+			JPanel painelIcone = new JPanel();
+			painelIcone.setLayout(new BorderLayout());
+			painelIcone.setOpaque(false);
+			painelIcone.setPreferredSize(new Dimension(123, 13));
+			
+			ImageIcon iconeInvertido = new ImageIcon(getClass().getResource("/icones/invertido.png"));
+			labelIcone = new JLabel(iconeInvertido);
+			labelIcone.setToolTipText("Grandeza inversamente proporcional");
+			labelIcone.setVisible(false);
+			painelIcone.add(labelIcone, BorderLayout.WEST);
+			
+			GridBagConstraints gbc = new GridBagConstraints();
+			gbc.gridy = 0;
+			gbc.insets = new Insets(0, 0, -2, 0);
+			add(painelIcone, gbc);
 		
-		GridBagConstraints gbc = new GridBagConstraints();
-		gbc.gridy = 0;
-		gbc.insets = new Insets(0, 0, -2, 0);
-		add(painel, gbc);
-		
-		MatteBorder contorno = new MatteBorder(1, 1, 3, 1, Color.BLACK);
-		MatteBorder brilho = new MatteBorder(2, 0, 0, 0, Color.WHITE);
-		setBorder(BorderFactory.createCompoundBorder(contorno, brilho));
-		Insets textFieldInsets = new Insets(6, 0, 0, 0);
-		
-		titulo = new JTextField(tituloReserva);
+		// JTextFields:
+			titulo = new JTextField();
+			titulo.setBackground(null);
+			titulo.setBorder(new EmptyBorder(0, 0, -10, 0));
 			titulo.setFont(new Font("Calibri", Font.BOLD, 17));
 			titulo.setForeground(Color.WHITE);
-		    titulo.setHorizontalAlignment(JTextField.CENTER);
-		    titulo.setBorder(null);
-		    titulo.setBackground(null);
-		    titulo.addMouseListener(mouseListener);
+			titulo.setPreferredSize(new Dimension(133, 16));
+			titulo.setHorizontalAlignment(JTextField.CENTER);
+			titulo.setDocument(new LimitarCaracteres(12));
+			titulo.setText(tituloReserva);
+			titulo.getDocument().addDocumentListener(documentListener);
+			titulo.addMouseListener(mouseListener);
 		    gbc.gridy = 1;
-		    gbc.insets = new Insets(0, 0, 3, 0);
-		add(titulo, gbc);
+		    gbc.insets = new Insets(0, 0, 8, 0);
+			add(titulo, gbc);
 		    
-		A1 = new JTextField();
+			A1 = new JTextField();
 			A1.setFont(new Font("Calibri", Font.PLAIN, 18));
+			A1.setHorizontalAlignment(JTextField.CENTER);
 			A1.setMargin(textFieldInsets);
-	    	A1.setPreferredSize(new Dimension(100, 35));
-	    	A1.setHorizontalAlignment(JTextField.CENTER);
-	    	A1.getDocument().addDocumentListener(documentListener);
+	    	A1.setPreferredSize(new Dimension(105, 35));
+	    	A1.setDocument(new LimitarCaracteres(30));
+			A1.getDocument().addDocumentListener(documentListener);	
 	    	A1.addMouseListener(mouseListener);
 	    	gbc.gridy = 2;
 	    	gbc.insets = new Insets(0, 0, 8, 0);
-	    add(A1, gbc);
+		    add(A1, gbc);
 	    	
-		B1 = new JTextField();
+			B1 = new JTextField();
 			B1.setFont(new Font("Calibri", Font.PLAIN, 18));
+			B1.setHorizontalAlignment(JTextField.CENTER);
 			B1.setMargin(textFieldInsets);
-	    	B1.setPreferredSize(new Dimension(100, 35));
-	    	B1.setHorizontalAlignment(JTextField.CENTER);
-	    	B1.getDocument().addDocumentListener(documentListener);
+	    	B1.setPreferredSize(new Dimension(105, 35));
+	    	B1.setDocument(new LimitarCaracteres(30));
+			B1.getDocument().addDocumentListener(documentListener);
 	    	B1.addMouseListener(mouseListener);
 	    	gbc.gridy = 3;
 	    	gbc.insets = new Insets(0, 0, 8, 0);
-	    add(B1, gbc);
+		    add(B1, gbc);
 	    
 	    addMouseListener(mouseListener);
 	}
@@ -144,20 +156,41 @@ public class Grandeza extends JPanel
 	{
 		titulo.setText(tituloReserva);
 	}
-	
+
 	public void inverterGrandeza()
 	{
-		inverso = !inverso;
+		if(temIncognita == false)
+		{
+			inverso = !inverso;
+			fecharJanela();
+		}
+		else
+		{
+			inverso = false;
+		}
 		
-		if(inverso == false)
+		if(inverso == true)
+		{
+			setBackground(new Color(237, 125, 125));
+			labelIcone.setVisible(true);
+		}
+		else 
 		{
 			setBackground(new Color(140, 204, 183));  // Cor padrão
 			labelIcone.setVisible(false);
 		}
+	}
+	
+	public void verificar()
+	{
+		if(A1.getText().equals(Janela.caractere) || B1.getText().equals(Janela.caractere))
+		{
+			temIncognita = true;
+			inverterGrandeza();
+		}
 		else
 		{
-			setBackground(new Color(237, 125, 125));
-			labelIcone.setVisible(true);
+			temIncognita = false;
 		}
 	}
 }
