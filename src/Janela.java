@@ -34,16 +34,16 @@ import javax.swing.border.MatteBorder;
 
 public class Janela extends JFrame
 {
-	public static JPanel painelGrandezas, painelBotoes;
+	public static JPanel painelGrandezas;
 	public static String caractere = "x";
 	
-	private static int posicao = 3, posicaoAux;
+	private static int posicao = 3, posicaoAux, cont;
 	private static boolean estaCalculando;
 	
 	private Container contentPane = getContentPane();
 	private JScrollPane scrollPane;
+	private JPanel painelBotoes;
 	private JButton botaoAdicionar, botaoClear, botaoCalcular;
-	private int cont;
 	
 	public Janela()
 	{	
@@ -131,17 +131,20 @@ public class Janela extends JFrame
 			@Override
 			public void actionPerformed(ActionEvent event)
 			{
-				Grandeza.fecharJanela();
-				criarGrandeza(1);
-				
-				//	Aguarda a atualização do layout e posiciona a barra de rolagem no final
-				SwingUtilities.invokeLater(new Runnable()
+				if(cont <= 30)
 				{
-					public void run() 
+					Grandeza.fecharJanela();
+					criarGrandeza(1);
+					
+					//	Aguarda a atualização do layout e posiciona a barra de rolagem no final
+					SwingUtilities.invokeLater(new Runnable()
 					{
-						barraHorizontal.setValue(barraHorizontal.getMaximum() - barraHorizontal.getVisibleAmount()); 
-					}
-				});
+						public void run() 
+						{
+							barraHorizontal.setValue(barraHorizontal.getMaximum() - barraHorizontal.getVisibleAmount()); 
+						}
+					});
+				}
 			}
 		});
 		
@@ -174,14 +177,14 @@ public class Janela extends JFrame
 			{
 				Grandeza.fecharJanela();
 				posicionarComponentes();
-				reiniciarTitulos();
+				nomearComponentes();
 			}
 				
 			@Override
 			public void componentMoved(ComponentEvent event)
 			{
 				Grandeza.fecharJanela();
-				reiniciarTitulos();
+				nomearComponentes();
 			}
 		});
 		
@@ -193,7 +196,7 @@ public class Janela extends JFrame
 			{
 				Grandeza.fecharJanela();
 				posicionarComponentes();
-				reiniciarTitulos();
+				nomearComponentes();
 			}
 		});
 		
@@ -352,7 +355,7 @@ public class Janela extends JFrame
 					else
 					{
 						//	Multiplica os numeradores e denominadores entre si
-						if(g.inverso == false)
+						if(g.estaInvertido == false)
 						{
 							valorA = valorA.multiply(new BigDecimal(g.A1.getText()));
 							valorB = valorB.multiply(new BigDecimal(g.B1.getText()));
@@ -402,7 +405,7 @@ public class Janela extends JFrame
 			else
 				cont = 1;
 			
-			Grandeza g = new Grandeza(cont);
+			Grandeza g = new Grandeza();
 			painelGrandezas.add(g);
 			cont++;
 		}
@@ -410,6 +413,25 @@ public class Janela extends JFrame
 		scrollPane.revalidate();
 		scrollPane.repaint();
 		definirIncognita();
+		nomearComponentes();
+	}
+	
+	public static void nomearComponentes()
+	{
+		cont = 1;
+		
+		for(Component component : painelGrandezas.getComponents())
+		{
+			if(component instanceof Grandeza)
+			{
+				Grandeza g = (Grandeza)component;
+				
+				if(g.titulo.getText().isBlank() || g.titulo.getText().equals(g.tituloReserva) && g.tituloReserva.contains(String.valueOf(cont+1)))
+					g.inserirTitulo(cont);
+				
+				cont++;
+			}
+		}
 	}
 	
 	private void posicionarComponentes()
@@ -420,21 +442,7 @@ public class Janela extends JFrame
 		scrollPane.repaint();
 		painelBotoes.setLocation(getWidth()/2 - (painelBotoes.getWidth()/2 + 9), scrollPane.getY() + (scrollPane.getHeight() + 6));
 	}
-	
-	private void reiniciarTitulos()
-	{
-		for(Component component : painelGrandezas.getComponents())
-		{
-			if(component instanceof Grandeza)
-			{
-				Grandeza g = (Grandeza)component;
-				
-				if(g.titulo.getText().isBlank())
-					g.inserirTitulo();
-			}
-		}
-	}
-	
+
 	private void selecionarTexto()
 	{
 		//  Seleciona o primeiro JTextField ao iniciar o programa

@@ -21,12 +21,12 @@ import javax.swing.event.DocumentListener;
 public class Grandeza extends JPanel
 {	
 	public JTextField titulo, A1, B1;
-	public boolean inverso = false, temIncognita = false;
+	public String tituloReserva;
+	public boolean estaInvertido = false, temIncognita = false;
 	
 	private static JanelaOpcoes janelaOpcoes;
 	
 	private JLabel labelIcone = new JLabel();
-	private String tituloReserva;
 	private boolean abrirJanela = false;
 
 	private DocumentListener documentListener = new DocumentListener()
@@ -38,7 +38,7 @@ public class Grandeza extends JPanel
 			Janela.definirIncognita();
 			
 			if(event.getDocument() != titulo.getDocument() && titulo.getText().isBlank())
-				inserirTitulo();
+				Janela.nomearComponentes();
 		}
 		
 		@Override
@@ -48,7 +48,7 @@ public class Grandeza extends JPanel
 			Janela.definirIncognita();
 			
 			if(event.getDocument() != titulo.getDocument() && titulo.getText().isBlank())
-				inserirTitulo();
+				Janela.nomearComponentes();
 		}
 		
 		@Override
@@ -58,7 +58,7 @@ public class Grandeza extends JPanel
 		}
 	};
 	
-	public Grandeza(int cont)
+	public Grandeza()
 	{	
 		MouseListener mouseListener = new MouseAdapter()
 		{
@@ -75,7 +75,6 @@ public class Grandeza extends JPanel
 	    	}
 		};
 		
-		tituloReserva = "GRANDEZA  " + cont;
 		setPreferredSize(new Dimension(135, 133));
 		setBackground(new Color(140, 204, 183));
 		setLayout(new GridBagLayout());
@@ -106,13 +105,12 @@ public class Grandeza extends JPanel
 		// JTextFields:
 			titulo = new JTextField();
 			titulo.setBackground(null);
-			titulo.setBorder(new EmptyBorder(0, 0, -10, 0));
+			titulo.setBorder(new EmptyBorder(0, 0, -8, 0));
 			titulo.setFont(new Font("Calibri", Font.BOLD, 17));
 			titulo.setForeground(Color.WHITE);
-			titulo.setPreferredSize(new Dimension(133, 16));
+			titulo.setPreferredSize(new Dimension(133, 18));
 			titulo.setHorizontalAlignment(JTextField.CENTER);
 			titulo.setDocument(new LimitarCaracteres(12));
-			titulo.setText(tituloReserva);
 			titulo.getDocument().addDocumentListener(documentListener);
 			titulo.addMouseListener(mouseListener);
 		    gbc.gridy = 1;
@@ -152,24 +150,26 @@ public class Grandeza extends JPanel
 			janelaOpcoes.dispose();
 	}
 	
-	public void inserirTitulo()
+	public void inserirTitulo(int cont)
 	{
-		titulo.setText(tituloReserva);
+		String texto = "GRANDEZA  " + cont;
+		titulo.setText(texto);
+		tituloReserva = texto;
 	}
 
 	public void inverterGrandeza()
 	{
 		if(temIncognita == false)
 		{
-			inverso = !inverso;
+			estaInvertido = !estaInvertido;
 			fecharJanela();
 		}
 		else
 		{
-			inverso = false;
+			estaInvertido = false;
 		}
 		
-		if(inverso == true)
+		if(estaInvertido == true)
 		{
 			setBackground(new Color(237, 125, 125));
 			labelIcone.setVisible(true);

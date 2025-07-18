@@ -56,6 +56,7 @@ public class JanelaOpcoes extends JFrame
 					Janela.painelGrandezas.revalidate();
 					Janela.painelGrandezas.repaint();
 					Janela.definirIncognita();
+					Janela.nomearComponentes();
 					dispose();
 				}
 			});
